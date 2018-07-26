@@ -921,7 +921,9 @@ public class StatusBar extends SystemUI implements DemoMode,
             mContext.getContentResolver().registerContentObserver(Settings.System.getUriFor(
                     Settings.System.SCREEN_BRIGHTNESS_MODE),
                     false, this, UserHandle.USER_ALL);
-
+            mContext.getContentResolver().registerContentObserver(Settings.System.getUriFor(
+                    Settings.System.SHAKE_CLEAN_NOTIFICATION),
+                    false, this, UserHandle.USER_ALL);
         }
 
         @Override
@@ -1171,8 +1173,6 @@ public class StatusBar extends SystemUI implements DemoMode,
         // Lastly, call to the icon policy to install/update all the icons.
         mIconPolicy = new PhoneStatusBarPolicy(mContext, mIconController);
         mSettingsObserver.onChange(false); // set up
-        mSdhzSettingsObserver.observe();
-        mSdhzSettingsObserver.update();
         mHeadsUpObserver.onChange(true); // set up
         if (ENABLE_HEADS_UP) {
             mContext.getContentResolver().registerContentObserver(
@@ -6294,28 +6294,6 @@ public class StatusBar extends SystemUI implements DemoMode,
         mBrightnessControl = Settings.System.getIntForUser(
                 mContext.getContentResolver(), Settings.System.STATUS_BAR_BRIGHTNESS_CONTROL, 0,
                 UserHandle.USER_CURRENT) == 1;
-    }
-
-    private SdhzSettingsObserver mSdhzSettingsObserver = new SdhzSettingsObserver(mHandler);
-    private class SdhzSettingsObserver extends ContentObserver {
-        SdhzSettingsObserver(Handler handler) {
-            super(handler);
-        }
-
-        void observe() {
-            ContentResolver resolver = mContext.getContentResolver();
-            resolver.registerContentObserver(Settings.System.getUriFor(
-                    Settings.System.SHAKE_CLEAN_NOTIFICATION),
-                    false, this, UserHandle.USER_ALL);
-        }
-
-        @Override
-        public void onChange(boolean selfChange, Uri uri) {
-            update();
-        }
-
-        public void update() {
-        }
     }
 
     private RemoteViews.OnClickHandler mOnClickHandler = new RemoteViews.OnClickHandler() {
